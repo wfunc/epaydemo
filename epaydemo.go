@@ -281,6 +281,36 @@ func PreAddCard(outOrderID, account, notifyURL, returnURL, cardNo, cardPhone str
 	return
 }
 
+func ApplyAddCardVerify(orderID, cardNo, cardPhone, password, randomKey string) (data xmap.M, err error) {
+	method := "applyAddCardVerify"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	xlog.Infof("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("order_id", orderID)
+	body.SetValue("card_no", cardNo)
+	body.SetValue("password", password)
+	body.SetValue("random_key", randomKey)
+	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	xlog.Infof("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func VerifyCard(orderID, code string) (data xmap.M, err error) {
+	method := "verifyCard"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	xlog.Infof("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("order_id", orderID)
+	body.SetValue("code", code)
+	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	xlog.Infof("接口响应：%v", converter.JSON(data))
+	return
+}
+
 func newBody(method string) xmap.M {
 	return xmap.M{
 		"merchant_id": MerchantID,
