@@ -230,7 +230,7 @@ func QueryLinkedAcct(account string) (data xmap.M, err error) {
 	xlog.Infof("接口响应：%v", converter.JSON(data))
 	return
 }
-func Withdrawal(account, amount, outOrderID, cardNo string) (data xmap.M, err error) {
+func Withdrawal(account, amount, outOrderID, cardNo, agreeNo string) (data xmap.M, err error) {
 	method := "withdrawal"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
@@ -240,6 +240,8 @@ func Withdrawal(account, amount, outOrderID, cardNo string) (data xmap.M, err er
 	body.SetValue("amount", amount)
 	body.SetValue("out_order_id", outOrderID)
 	body.SetValue("linked_acctno", cardNo)
+	body.SetValue("linked_agrtno", agreeNo)
+	body.SetValue("notify_url", ApplyWithdrawNotifyURL)
 	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
 	xlog.Infof("接口响应：%v", converter.JSON(data))
