@@ -201,7 +201,7 @@ func ApplyWithdraw(orderID, cardNo, acctName, bankName, amount string) (data xma
 	return
 }
 
-func ApplyOpenAcct(account, phone, returnURL string) (data xmap.M, err error) {
+func ApplyOpenAcct(account, phone, returnURL, notifyURL string) (data xmap.M, err error) {
 	method := "applyOpenAcct"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
@@ -210,6 +210,7 @@ func ApplyOpenAcct(account, phone, returnURL string) (data xmap.M, err error) {
 	body.SetValue("account", account)
 	body.SetValue("phone", phone)
 	body.SetValue("return_url", returnURL)
+	body.SetValue("notify_url", notifyURL)
 	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
 	xlog.Infof("接口响应：%v", converter.JSON(data))
