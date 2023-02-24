@@ -100,7 +100,7 @@ func TestApplyWithdraw(t *testing.T) {
 // 请求开户页面
 func TestApplyOpenAcct(t *testing.T) {
 	// ApiURL = "http://127.0.0.1:3838"
-	data, err := ApplyOpenAcct("100010", "", "https://www.baidu.com", "https://www.baidu.com")
+	data, err := ApplyOpenAcct("100010", "", "https://www.baidu.com")
 	if err != nil {
 		t.Errorf("TestApplyOpenAcct fail with %v", err)
 		return
