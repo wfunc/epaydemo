@@ -109,6 +109,7 @@ func TestApplyOpenAcct(t *testing.T) {
 }
 
 func TestWithdrawal(t *testing.T) {
+	Debug = true
 	orderID := NewOrderID()
 	data, err := Withdrawal("1", "1", orderID, "1", "1")
 	if err != nil {

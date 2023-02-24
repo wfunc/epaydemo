@@ -21,6 +21,7 @@ var (
 	PayCreateNotifyURL     = "https://example.com/notify/testNofity"
 	ApplyWithdrawNotifyURL = "https://example.com/notify/testNofity"
 	ApplyOpenAcctNotifyURL = "https://example.com/notify/testNofity"
+	Debug                  = false
 )
 
 var MarchineID = 1
@@ -47,7 +48,7 @@ func Sign(AccessToken string, m xmap.M) string {
 	args.Set("method", m.Str("method"))
 
 	signBefore := fmt.Sprintf("%v&access_token=%v", args.Encode(), AccessToken)
-	xlog.Infof("签名前字符串：%s", signBefore)
+	debugf("签名前字符串：%s", signBefore)
 	h := sha256.New()
 	h.Write([]byte(signBefore))
 	return fmt.Sprintf("%x", h.Sum(nil))
@@ -57,16 +58,16 @@ func ApplyMobilePay(orderID, payType, amount, fromIPAddr string) (data xmap.M, e
 	method := "applyMobilePay"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("out_order_id", orderID)
 	body.SetValue("pay_type", payType)
 	body.SetValue("notify_url", "https://example.com/notify/testNofity")
 	body.SetValue("amount", amount)
 	body.SetValue("from_ip_addr", fromIPAddr)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -74,7 +75,7 @@ func PayCreate(orderID, account, phone, amount, fromIPAddr string) (data xmap.M,
 	method := "payCreate"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("out_order_id", orderID)
 	body.SetValue("account", account)
@@ -82,9 +83,9 @@ func PayCreate(orderID, account, phone, amount, fromIPAddr string) (data xmap.M,
 	body.SetValue("notify_url", PayCreateNotifyURL)
 	body.SetValue("amount", amount)
 	body.SetValue("from_ip_addr", fromIPAddr)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -92,13 +93,13 @@ func ApplyPhoneCode(account, phone string) (data xmap.M, err error) {
 	method := "applyPhoneCode"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("phone", phone)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -106,14 +107,14 @@ func VerifyPhoneCode(account, phone, code string) (data xmap.M, err error) {
 	method := "verifyPhoneCode"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("phone", phone)
 	body.SetValue("code", code)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -121,14 +122,14 @@ func ApplyPasswordToken(account, phone, passwordScene string) (data xmap.M, err 
 	method := "applyPasswordToken"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("phone", phone)
 	body.SetValue("password_scene", passwordScene)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -136,7 +137,7 @@ func ApplyIndividual(account, phone, userName, idNo, idExp, address, occupation,
 	method := "applyIndividual"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("phone", phone)
@@ -147,9 +148,9 @@ func ApplyIndividual(account, phone, userName, idNo, idExp, address, occupation,
 	body.SetValue("occupation", occupation)
 	body.SetValue("card_no", cardNo)
 	body.SetValue("card_phone", cardPhone)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -157,16 +158,16 @@ func VerifyIndividual(account, phone, verifyCode, password, randomKey string) (d
 	method := "verifyIndividual"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("phone", phone)
 	body.SetValue("password", password)
 	body.SetValue("random_key", randomKey)
 	body.SetValue("verify_code", verifyCode)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -174,12 +175,12 @@ func QueryOrder(orderID string) (data xmap.M, err error) {
 	method := "queryOrder"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("order_id", orderID)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -187,7 +188,7 @@ func ApplyWithdraw(orderID, cardNo, acctName, bankName, amount string) (data xma
 	method := "applyWithdraw"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 
 	body.SetValue("sign", sign)
 	body.SetValue("out_order_id", orderID)
@@ -196,9 +197,9 @@ func ApplyWithdraw(orderID, cardNo, acctName, bankName, amount string) (data xma
 	body.SetValue("card_no", cardNo)
 	body.SetValue("acct_name", acctName)
 	body.SetValue("bank_name", bankName)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -206,15 +207,15 @@ func ApplyOpenAcct(account, phone, returnURL string) (data xmap.M, err error) {
 	method := "applyOpenAcct"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("phone", phone)
 	body.SetValue("return_url", returnURL)
 	body.SetValue("notify_url", ApplyOpenAcctNotifyURL)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -222,19 +223,19 @@ func QueryLinkedAcct(account string) (data xmap.M, err error) {
 	method := "queryLinkedAcct"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 func Withdrawal(account, amount, outOrderID, cardNo, agreeNo string) (data xmap.M, err error) {
 	method := "withdrawal"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("amount", amount)
@@ -242,9 +243,9 @@ func Withdrawal(account, amount, outOrderID, cardNo, agreeNo string) (data xmap.
 	body.SetValue("linked_acctno", cardNo)
 	body.SetValue("linked_agrtno", agreeNo)
 	body.SetValue("notify_url", ApplyWithdrawNotifyURL)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -252,13 +253,13 @@ func ValidationSMS(outOrderID, code string) (data xmap.M, err error) {
 	method := "validationSMS"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("out_order_id", outOrderID)
 	body.SetValue("code", code)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -266,7 +267,7 @@ func PreAddCard(outOrderID, account, notifyURL, returnURL, cardNo, cardPhone str
 	method := "preAddCard"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("account", account)
 	body.SetValue("out_order_id", outOrderID)
@@ -279,9 +280,9 @@ func PreAddCard(outOrderID, account, notifyURL, returnURL, cardNo, cardPhone str
 	if cardPhone != "" {
 		body.SetValue("card_phone", cardPhone)
 	}
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -289,15 +290,15 @@ func ApplyAddCardVerify(orderID, cardNo, cardPhone, password, randomKey string) 
 	method := "applyAddCardVerify"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("order_id", orderID)
 	body.SetValue("card_no", cardNo)
 	body.SetValue("password", password)
 	body.SetValue("random_key", randomKey)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -305,13 +306,13 @@ func VerifyCard(orderID, code string) (data xmap.M, err error) {
 	method := "verifyCard"
 	body := newBody(method)
 	sign := Sign(AccessToken, body)
-	xlog.Infof("签名后字符串：%s", sign)
+	debugf("签名后字符串：%s", sign)
 	body.SetValue("sign", sign)
 	body.SetValue("order_id", orderID)
 	body.SetValue("code", code)
-	xlog.Infof("提交的JSON数据：%v", converter.JSON(body))
+	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
-	xlog.Infof("接口响应：%v", converter.JSON(data))
+	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
 
@@ -320,5 +321,11 @@ func newBody(method string) xmap.M {
 		"merchant_id": MerchantID,
 		"method":      method,
 		"timestamp":   time.Now().UnixMilli(),
+	}
+}
+
+func debugf(template string, args ...interface{}) {
+	if Debug {
+		xlog.Infof(template, args...)
 	}
 }
