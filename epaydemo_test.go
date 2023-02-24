@@ -110,7 +110,7 @@ func TestApplyOpenAcct(t *testing.T) {
 
 func TestWithdrawal(t *testing.T) {
 	orderID := NewOrderID()
-	data, err := Withdrawal("1", "1", orderID, "1")
+	data, err := Withdrawal("1", "1", orderID, "1", "1")
 	if err != nil {
 		t.Errorf("TestWithdrawal fail with %v", err)
 		return
