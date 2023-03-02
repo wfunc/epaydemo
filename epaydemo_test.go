@@ -5,6 +5,16 @@ import (
 	"testing"
 )
 
+// 支付宝扫码支付
+func TestApplyScanPay(t *testing.T) {
+	orderID := NewOrderID()
+	_, err := ApplyScanPay(orderID, "0.01", "127.0.0.1")
+	if err != nil {
+		t.Errorf("TestApplyScanPay fail with %v", err)
+		return
+	}
+}
+
 // 查询订单接口
 func TestQueryOrder(t *testing.T) {
 	_, err := QueryOrder("202302041730530100001")

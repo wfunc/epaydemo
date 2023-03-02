@@ -21,6 +21,7 @@ var (
 	PayCreateNotifyURL     = "https://example.com/notify/testNofity"
 	ApplyWithdrawNotifyURL = "https://example.com/notify/testNofity"
 	ApplyOpenAcctNotifyURL = "https://example.com/notify/testNofity"
+	ApplyScanPayNotifyURL  = "https://example.com/notify/testNofity"
 	Debug                  = false
 )
 
@@ -52,6 +53,23 @@ func Sign(AccessToken string, m xmap.M) string {
 	h := sha256.New()
 	h.Write([]byte(signBefore))
 	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+func ApplyScanPay(outOrderID, amount, fromIPAddr string) (data xmap.M, err error) {
+	method := "applyScanPay"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("pay_type", "alipay_qrcode")
+	body.SetValue("out_order_id", outOrderID)
+	body.SetValue("notify_url", ApplyScanPayNotifyURL)
+	body.SetValue("amount", amount)
+	body.SetValue("from_ip_addr", fromIPAddr)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
 }
 
 func ApplyMobilePay(orderID, payType, amount, fromIPAddr string) (data xmap.M, err error) {
