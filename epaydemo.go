@@ -15,14 +15,15 @@ import (
 )
 
 var (
-	MerchantID             = 100000
-	AccessToken            = "48c3cf04d96841986b073a1c98a45cec2e4adfa9"
-	ApiURL                 = "https://example.com"
-	PayCreateNotifyURL     = "https://example.com/notify/testNofity"
-	ApplyWithdrawNotifyURL = "https://example.com/notify/testNofity"
-	ApplyOpenAcctNotifyURL = "https://example.com/notify/testNofity"
-	ApplyScanPayNotifyURL  = "https://example.com/notify/testNofity"
-	Debug                  = false
+	MerchantID                = 100000
+	AccessToken               = "48c3cf04d96841986b073a1c98a45cec2e4adfa9"
+	ApiURL                    = "https://example.com"
+	PayCreateNotifyURL        = "https://example.com/notify/testNofity"
+	ApplyWithdrawNotifyURL    = "https://example.com/notify/testNofity"
+	ApplyOpenAcctNotifyURL    = "https://example.com/notify/testNofity"
+	ApplyScanPayNotifyURL     = "https://example.com/notify/testNofity"
+	HCApiSendMessageNotifyURL = "https://example.com/notify/testNofity"
+	Debug                     = false
 )
 
 var MarchineID = 1
@@ -55,6 +56,7 @@ func Sign(AccessToken string, m xmap.M) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
+// 汇潮扫码支付
 func ApplyScanPay(outOrderID, amount, fromIPAddr string) (data xmap.M, err error) {
 	method := "applyScanPay"
 	body := newBody(method)
@@ -66,6 +68,71 @@ func ApplyScanPay(outOrderID, amount, fromIPAddr string) (data xmap.M, err error
 	body.SetValue("notify_url", ApplyScanPayNotifyURL)
 	body.SetValue("amount", amount)
 	body.SetValue("from_ip_addr", fromIPAddr)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+// 汇潮用户进件
+func HCNetwork(account, name, mobile, idNo, idValidity, cardNo string) (data xmap.M, err error) {
+	method := "hcNetwork"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("account", account)
+	body.SetValue("name", name)
+	body.SetValue("mobile", mobile)
+	body.SetValue("id_no", idNo)
+	body.SetValue("id_validity", idValidity)
+	body.SetValue("card_no", cardNo)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func HCQueryNetwork(account string) (data xmap.M, err error) {
+	method := "hcQueryNetwork"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("account", account)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func HCApiSendMessage(account, outOrderID, cardNo, cardPhone, cvn2, expired string) (data xmap.M, err error) {
+	method := "hcApiSendMessage"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("account", account)
+	body.SetValue("out_order_id", outOrderID)
+	body.SetValue("card_no", cardNo)
+	body.SetValue("card_phone", cardPhone)
+	body.SetValue("cvn2", cvn2)
+	body.SetValue("expired", expired)
+	body.SetValue("notify_url", HCApiSendMessageNotifyURL)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func HCApiVerifyCard(outOrderID, code string) (data xmap.M, err error) {
+	method := "hcApiVerifyCard"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("out_order_id", outOrderID)
+	body.SetValue("code", code)
 	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
 	debugf("接口响应：%v", converter.JSON(data))

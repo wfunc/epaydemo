@@ -3,6 +3,8 @@ package epaydemo
 import (
 	"fmt"
 	"testing"
+
+	"github.com/codingeasygo/util/converter"
 )
 
 // 支付宝扫码支付
@@ -13,6 +15,44 @@ func TestApplyScanPay(t *testing.T) {
 		t.Errorf("TestApplyScanPay fail with %v", err)
 		return
 	}
+}
+
+// 汇潮用户进件
+func TestHCNetwork(t *testing.T) {
+	hcNetwork, err := HCNetwork("test1", "123", "123", "123", "123", "123")
+	if err != nil {
+		t.Errorf("TestHCNetwork fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCNetwork data is %v\n", converter.JSON(hcNetwork))
+}
+
+func TestHCQueryNetwork(t *testing.T) {
+	hcNetwork, err := HCQueryNetwork("test1")
+	if err != nil {
+		t.Errorf("TestHCQueryNetwork fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCQueryNetwork data is %v\n", converter.JSON(hcNetwork))
+}
+
+func TestHCApiSendMessage(t *testing.T) {
+	orderID := NewOrderID()
+	hcApiSendMessage, err := HCApiSendMessage("test1", orderID, "123", "123", "123", "123")
+	if err != nil {
+		t.Errorf("TestHCApiSendMessage fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCApiSendMessage data is %v\n", converter.JSON(hcApiSendMessage))
+}
+
+func TestHCApiVerifyCard(t *testing.T) {
+	hcApiVerifyCard, err := HCApiVerifyCard("test1", "123")
+	if err != nil {
+		t.Errorf("TestHCApiVerifyCard fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCApiVerifyCard data is %v\n", converter.JSON(hcApiVerifyCard))
 }
 
 // 查询订单接口
