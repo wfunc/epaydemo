@@ -23,6 +23,8 @@ var (
 	ApplyOpenAcctNotifyURL    = "https://example.com/notify/testNofity"
 	ApplyScanPayNotifyURL     = "https://example.com/notify/testNofity"
 	HCApiSendMessageNotifyURL = "https://example.com/notify/testNofity"
+	HCTradeForCardNotifyURL   = "https://example.com/notify/testNofity"
+	HCWithdrawalNotifyURL     = "https://example.com/notify/testNofity"
 	Debug                     = false
 )
 
@@ -133,6 +135,56 @@ func HCApiVerifyCard(outOrderID, code string) (data xmap.M, err error) {
 	body.SetValue("sign", sign)
 	body.SetValue("out_order_id", outOrderID)
 	body.SetValue("code", code)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func HCTradeForCard(outOrderID, account, cardNo, cardPhone, amount, fee string) (data xmap.M, err error) {
+	method := "hcTradeForCard"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("out_order_id", outOrderID)
+	body.SetValue("account", account)
+	body.SetValue("card_no", cardNo)
+	body.SetValue("card_phone", cardPhone)
+	body.SetValue("amount", amount)
+	body.SetValue("fee", fee)
+	body.SetValue("notify_url", HCTradeForCardNotifyURL)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func HCWithdrawal(outOrderID, account, cardNo, cardPhone, amount string) (data xmap.M, err error) {
+	method := "hcWithdrawal"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("out_order_id", outOrderID)
+	body.SetValue("account", account)
+	body.SetValue("card_no", cardNo)
+	body.SetValue("card_phone", cardPhone)
+	body.SetValue("amount", amount)
+	body.SetValue("notify_url", HCWithdrawalNotifyURL)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func HCQueryBalance(account string) (data xmap.M, err error) {
+	method := "hcQueryBalance"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("account", account)
 	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
 	debugf("接口响应：%v", converter.JSON(data))

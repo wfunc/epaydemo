@@ -55,6 +55,35 @@ func TestHCApiVerifyCard(t *testing.T) {
 	fmt.Printf("TestHCApiVerifyCard data is %v\n", converter.JSON(hcApiVerifyCard))
 }
 
+func TestHCTradeForCard(t *testing.T) {
+	orderID := NewOrderID()
+	hcTradeForCard, err := HCTradeForCard(orderID, "test", "6214xxx", "13800138000", "1000", "0")
+	if err != nil {
+		t.Errorf("TestHCTradeForCard fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCTradeForCard data is %v\n", converter.JSON(hcTradeForCard))
+}
+
+func TestHCWithdrawal(t *testing.T) {
+	orderID := NewOrderID()
+	hcWithdrawal, err := HCWithdrawal(orderID, "test", "6214xxx", "13800138000", "1000")
+	if err != nil {
+		t.Errorf("TestHCWithdrawal fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCWithdrawal data is %v\n", converter.JSON(hcWithdrawal))
+}
+
+func TestHCQueryBalance(t *testing.T) {
+	hcQueryBalance, err := HCQueryBalance("test1")
+	if err != nil {
+		t.Errorf("TestHCQueryBalance fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCQueryBalance data is %v\n", converter.JSON(hcQueryBalance))
+}
+
 // 查询订单接口
 func TestQueryOrder(t *testing.T) {
 	_, err := QueryOrder("202302041730530100001")
