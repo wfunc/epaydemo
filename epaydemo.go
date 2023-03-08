@@ -108,6 +108,21 @@ func HCQueryNetwork(account string) (data xmap.M, err error) {
 	return
 }
 
+func HCSubMerBindCard(account, cardNo, cardPhone, bankName string) (data xmap.M, err error) {
+	method := "hcSubMerBindCard"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("account", account)
+	body.SetValue("card_no", cardNo)
+	body.SetValue("card_phone", cardPhone)
+	body.SetValue("bank_name", bankName)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	return
+}
+
 func HCApiSendMessage(account, outOrderID, cardNo, cardPhone, cvn2, expired string) (data xmap.M, err error) {
 	method := "hcApiSendMessage"
 	body := newBody(method)

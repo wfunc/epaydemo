@@ -84,6 +84,15 @@ func TestHCQueryBalance(t *testing.T) {
 	fmt.Printf("TestHCQueryBalance data is %v\n", converter.JSON(hcQueryBalance))
 }
 
+func TestHCSubMerBindCard(t *testing.T) {
+	hcSubMerBindCard, err := HCSubMerBindCard("test", "test", "test", "招商银行")
+	if err != nil {
+		t.Errorf("TestHCQueryBalance fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCQueryBalance data is %v\n", converter.JSON(hcSubMerBindCard))
+}
+
 // 查询订单接口
 func TestQueryOrder(t *testing.T) {
 	_, err := QueryOrder("202302041730530100001")
