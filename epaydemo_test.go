@@ -75,6 +75,18 @@ func TestHCWithdrawal(t *testing.T) {
 	fmt.Printf("TestHCWithdrawal data is %v\n", converter.JSON(hcWithdrawal))
 }
 
+func TestHCPayOut(t *testing.T) {
+	orderID := NewOrderID()
+	hcPayOut, err := HCPayOut(orderID, "18200892266_18200892266", "6214830207649988", "18200892266", "招商银行", "吴辉南", "11")
+	if err != nil {
+		t.Errorf("TestHCPayOut fail with %v", err)
+		return
+	}
+	fmt.Printf("TestHCPayOut data is %v\n", converter.JSON(hcPayOut))
+}
+
+// HCPayOut
+
 func TestHCQueryBalance(t *testing.T) {
 	hcQueryBalance, err := HCQueryBalance("test1")
 	if err != nil {
@@ -128,6 +140,16 @@ func TestQueryLinkedAcct(t *testing.T) {
 		t.Errorf("TestQueryLinkedAcct fail with %v", err)
 		return
 	}
+}
+
+func TestQueryUserInfo(t *testing.T) {
+	ApiURL = "https://epay.michongfun.com"
+	queryUserInfo, err := QueryUserInfo("63155")
+	if err != nil {
+		t.Errorf("TestQueryUserInfo fail with %v", err)
+		return
+	}
+	fmt.Println(converter.JSON(queryUserInfo))
 }
 
 // 申请验证码接口

@@ -25,6 +25,7 @@ var (
 	HCApiSendMessageNotifyURL = "https://example.com/notify/testNofity"
 	HCTradeForCardNotifyURL   = "https://example.com/notify/testNofity"
 	HCWithdrawalNotifyURL     = "https://example.com/notify/testNofity"
+	HCPayOutNotifyURL         = "https://example.com/notify/testNofity"
 	Debug                     = false
 )
 
@@ -187,6 +188,26 @@ func HCWithdrawal(outOrderID, account, cardNo, cardPhone, amount string) (data x
 	body.SetValue("card_phone", cardPhone)
 	body.SetValue("amount", amount)
 	body.SetValue("notify_url", HCWithdrawalNotifyURL)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func HCPayOut(outOrderID, account, cardNo, cardPhone, bankName, name, amount string) (data xmap.M, err error) {
+	method := "hcPayOut"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("out_order_id", outOrderID)
+	body.SetValue("account", account)
+	body.SetValue("card_no", cardNo)
+	body.SetValue("card_phone", cardPhone)
+	body.SetValue("bank_name", bankName)
+	body.SetValue("name", name)
+	body.SetValue("amount", amount)
+	body.SetValue("notify_url", HCPayOutNotifyURL)
 	debugf("提交的JSON数据：%v", converter.JSON(body))
 	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
 	debugf("接口响应：%v", converter.JSON(data))
@@ -383,6 +404,33 @@ func QueryLinkedAcct(account string) (data xmap.M, err error) {
 	debugf("接口响应：%v", converter.JSON(data))
 	return
 }
+
+func QueryAcctInfo(account string) (data xmap.M, err error) {
+	method := "queryAcctInfo"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("account", account)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
+func QueryUserInfo(account string) (data xmap.M, err error) {
+	method := "queryUserInfo"
+	body := newBody(method)
+	sign := Sign(AccessToken, body)
+	debugf("签名后字符串：%s", sign)
+	body.SetValue("sign", sign)
+	body.SetValue("account", account)
+	debugf("提交的JSON数据：%v", converter.JSON(body))
+	data, err = xhttp.PostJSONMap(body, ApiURL+"/easyapi/"+method)
+	debugf("接口响应：%v", converter.JSON(data))
+	return
+}
+
 func Withdrawal(account, amount, outOrderID, cardNo, agreeNo string) (data xmap.M, err error) {
 	method := "withdrawal"
 	body := newBody(method)
