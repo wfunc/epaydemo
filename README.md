@@ -2,10 +2,8 @@
 
 ## SHA256 online for check
 https://emn178.github.io/online-tools/sha256.html
-
-## epaydemo_test.go for example test
 ## should set MerchantID & AccessToken
-
+## epaydemo_test.go for example test
 ## epaydemo.go for example
 ### about sign
 * sign code
@@ -54,7 +52,7 @@ func BindCardApply(outOrderID, cardName, certID, cardNo, cardPhone, bankName str
 	p.SetValue("bank_name", bankName)
 	p.SetValue("notify_url", ApplyAddCardVerifyNotifyURL)
 	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
-	debugf("接口响应：%v", converter.JSON(data))
+	debugf("response：%v", converter.JSON(data))
 	return
 }
 ```
