@@ -86,6 +86,124 @@ func newParams(method string) xmap.M {
 	}
 }
 
+type APIUserRegist struct {
+	MerchantID            int64  `json:"merchant_id" valid:"merchant_id,r|i,r:0;"`
+	Method                string `json:"method" valid:"method,o|s,O:userRegist;"`
+	Timestamp             int64  `json:"timestamp" valid:"timestamp,r|i,r:0;"`
+	Sign                  string `json:"sign" valid:"sign,o|s,l:0;"`
+	OutOrderID            string `json:"out_order_id" valid:"out_order_id,r|s,l:0;"`
+	UserName              string `json:"user_name" valid:"user_name,r|s,l:0;"`
+	Phone                 string `json:"phone" valid:"phone,r|s,l:0;"`
+	IDCardNo              string `json:"id_card_no" valid:"id_card_no,r|s,l:0;"`
+	IDCardGrantDate       string `json:"id_card_grant_date" valid:"id_card_grant_date,r|s,l:0;"`
+	IDCardExpire          string `json:"id_card_expire" valid:"id_card_expire,r|s,l:0;"`
+	IDCardFront           string `json:"id_card_front" valid:"id_card_front,r|s,l:0;"`
+	IDCardBack            string `json:"id_card_back" valid:"id_card_back,r|s,l:0;"`
+	HandIdCard            string `json:"hand_id_card" valid:"hand_id_card,r|s,l:0;"`
+	DebitCardAccount      string `json:"debit_card_account" valid:"debit_card_account,r|s,l:0;"`
+	DebitCardAccountPhone string `json:"debit_card_account_phone" valid:"debit_card_account_phone,r|s,l:0;"`
+	DebitCardBankName     string `json:"debit_card_bank_name" valid:"debit_card_bank_name,r|s,l:0;"`
+	DebitCardBankCode     string `json:"debit_card_bank_code" valid:"debit_card_bank_code,r|s,l:0;"`
+	BankUnitedCode        string `json:"bank_united_code" valid:"bank_united_code,r|s,l:0;"`
+	BankSubName           string `json:"bank_sub_name" valid:"bank_sub_name,r|s,l:0;"`
+	BankProvince          string `json:"bank_province" valid:"bank_province,r|s,l:0;"`
+	BankCity              string `json:"bank_city" valid:"bank_city,r|s,l:0;"`
+	NotifyURL             string `json:"notify_url" valid:"notify_url,r|s,l:0;"`
+	SuccessTurnUrl        string `json:"success_turn_url" valid:"success_turn_url,r|s,l:0;"`
+	ProvinceCode          string `json:"province_code" valid:"province_code,r|s,l:0;"`
+	CityCode              string `json:"city_code" valid:"city_code,r|s,l:0;"`
+	AreaCountyCode        string `json:"area_county_code" valid:"area_county_code,r|s,l:0;"`
+	MerchantAddress       string `json:"merchant_address" valid:"merchant_address,r|s,l:0;"`
+	Memo                  string `json:"memo" valid:"memo,o|s,l:0;"` //可选
+}
+
+func UserRegist(req APIUserRegist) (resp xmap.M, err error) {
+	method := "userRegist"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	req.Sign = sign
+	req.MerchantID = p.Int64("merchant_id")
+	req.Timestamp = p.Int64("timestamp")
+	req.Method = method
+	resp, err = xhttp.PostJSONMap(req, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(resp))
+	return
+}
+
+type APILivingIdentify struct {
+	MerchantID int64  `json:"merchant_id" valid:"merchant_id,r|i,r:0;"`
+	Method     string `json:"method" valid:"method,o|s,O:livingIdentify;"`
+	Timestamp  int64  `json:"timestamp" valid:"timestamp,r|i,r:0;"`
+	Sign       string `json:"sign" valid:"sign,o|s,l:0;"`
+	OutOrderID string `json:"out_order_id" valid:"out_order_id,r|s,l:0;"`
+}
+
+func LivingIdentify(req APILivingIdentify) (resp xmap.M, err error) {
+	method := "livingIdentify"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	req.Sign = sign
+	req.MerchantID = p.Int64("merchant_id")
+	req.Timestamp = p.Int64("timestamp")
+	req.Method = method
+	resp, err = xhttp.PostJSONMap(req, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(resp))
+	return
+}
+
+type APIQueryLiving struct {
+	MerchantID int64  `json:"merchant_id" valid:"merchant_id,r|i,r:0;"`
+	Method     string `json:"method" valid:"method,o|s,O:queryLiving;"`
+	Timestamp  int64  `json:"timestamp" valid:"timestamp,r|i,r:0;"`
+	Sign       string `json:"sign" valid:"sign,o|s,l:0;"`
+	OutOrderID string `json:"out_order_id" valid:"out_order_id,r|s,l:0;"`
+}
+
+func QueryLiving(req APIQueryLiving) (resp xmap.M, err error) {
+	method := "queryLiving"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	req.Sign = sign
+	req.MerchantID = p.Int64("merchant_id")
+	req.Timestamp = p.Int64("timestamp")
+	req.Method = method
+	resp, err = xhttp.PostJSONMap(req, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(resp))
+	return
+}
+
+type APISendWKPayment struct {
+	MerchantID         int64  `json:"merchant_id" valid:"merchant_id,r|i,r:0;"`
+	Method             string `json:"method" valid:"method,o|s,O:sendWKPayment;"`
+	Timestamp          int64  `json:"timestamp" valid:"timestamp,o|i,r:0;"`
+	Sign               string `json:"sign" valid:"sign,o|s,l:0;"`
+	CustomerID         int64  `json:"customer_id" valid:"customer_id,o|i,r:0;"`
+	CustomerOutOrderID string `json:"customer_out_order_id" valid:"customer_out_order_id,o|s,l:0;"` //可选
+	OutOrderID         string `json:"out_order_id" valid:"out_order_id,r|s,l:0;"`
+	Amount             string `json:"amount" valid:"amount,r|s,l:0;"`
+	NotifyURL          string `json:"notify_url" valid:"notify_url,o|s,l:0;"`
+	FromIPAddr         string `json:"from_ip_addr" valid:"from_ip_addr,o|s,l:0;"`
+	Memo               string `json:"memo" valid:"memo,o|s,l:0;"` //可选
+	GoodsTitle         string `json:"goods_title" valid:"goods_title,o|s,l:0;"`
+	GoodsDescription   string `json:"goods_description" valid:"goods_description,o|s,l:0;"`
+	SuccessTurnUrl     string `json:"success_turn_url" valid:"success_turn_url,o|s,l:0;"`
+	Rate               string `json:"rate" valid:"rate,r|s,l:0;"`
+	Pro                string `json:"pro" valid:"pro,r|s,l:0;"`
+}
+
+func SendWKPayment(req APISendWKPayment) (resp xmap.M, err error) {
+	method := "sendWKPayment"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	req.Sign = sign
+	req.MerchantID = p.Int64("merchant_id")
+	req.Timestamp = p.Int64("timestamp")
+	req.Method = method
+	resp, err = xhttp.PostJSONMap(req, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(resp))
+	return
+}
+
 // Adapay
 func BindCardApply(outOrderID, cardName, certID, cardNo, cardPhone, bankName string) (data xmap.M, err error) {
 	method := "bindCardApply"
@@ -245,7 +363,7 @@ func Upload(filePath string) (data xmap.M, err error) {
 	for k, v := range p {
 		args.Set(k, converter.String(v))
 	}
-	debugf("提交的GET数据：%v", args.Encode())
+	debugf("the submit GET data：%v", args.Encode())
 	return xhttp.UploadMap(nil, "file", filePath, ApiURL+"/easyapi/"+method+"?%v", args.Encode())
 }
 
@@ -270,7 +388,7 @@ func YeepayAddCustomer(account, name, idNumber, idFrontPath, idBackPath, cardNo,
 	return
 }
 
-// 智付支付
+// gateway pay
 func ZfGatewayPay(outOrderID, payType, amount, fromIPAddr string) (data xmap.M, err error) {
 	method := "zfGatewayPay"
 	p := newParams(method)
@@ -288,7 +406,7 @@ func ZfGatewayPay(outOrderID, payType, amount, fromIPAddr string) (data xmap.M, 
 	return
 }
 
-// 汇潮扫码支付
+// scan pay
 func ApplyScanPay(outOrderID, amount, fromIPAddr string) (data xmap.M, err error) {
 	method := "applyScanPay"
 	p := newParams(method)
@@ -306,7 +424,7 @@ func ApplyScanPay(outOrderID, amount, fromIPAddr string) (data xmap.M, err error
 	return
 }
 
-// 汇潮用户进件
+// open account
 func HCNetwork(account, name, mobile, idNo, idValidity, cardNo, bankName, bankBracnh string) (data xmap.M, err error) {
 	method := "hcNetwork"
 	p := newParams(method)
@@ -940,7 +1058,6 @@ func EfpsProtocolPayConfirm(orderID, code string) (data xmap.M, err error) {
 	return
 }
 
-// 套现接口
 func NoBindWKPayment(account, outOrderID, amount, creditCardNo, creditCardAccountName, creditCardPhone, creditCardCvv, creditCardExpire, creditCardBankName, debitCardNo, debitCardPhone, debitCardBankName, idNumber, rate, pro string) (data xmap.M, err error) {
 	method := "noBindWKPayment"
 	p := newParams(method)
