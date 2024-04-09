@@ -133,7 +133,7 @@ func AlipayTradePreCreate(outOrderID, amount, subject, memo string) (resp xmap.M
 	return
 }
 
-func SandpayTransOrderCreate(outOrderID, amount, fromIpAddr, memo string) (resp xmap.M, err error) {
+func SandpayTransOrderCreate(outOrderID, amount, fromIpAddr, memo, subject string) (resp xmap.M, err error) {
 	method := "sandpayTransOrderCreate"
 	p := newParams(method)
 	sign := Sign(AccessToken, p)
@@ -143,6 +143,9 @@ func SandpayTransOrderCreate(outOrderID, amount, fromIpAddr, memo string) (resp 
 	p.SetValue("from_ip_addr", fromIpAddr)
 	if len(memo) > 0 {
 		p.SetValue("memo", memo)
+	}
+	if len(subject) > 0 {
+		p.SetValue("subject", subject)
 	}
 	resp, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
 	debugf("response：%v", converter.JSON(resp))
