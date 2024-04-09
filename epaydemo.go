@@ -117,6 +117,38 @@ type APIUserRegist struct {
 	Memo                  string `json:"memo" valid:"memo,o|s,l:0;"` //可选
 }
 
+func AlipayTradePreCreate(outOrderID, amount, subject, memo string) (resp xmap.M, err error) {
+	method := "alipayTradePreCreate"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("subject", subject)
+	if len(memo) > 0 {
+		p.SetValue("memo", memo)
+	}
+	resp, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(resp))
+	return
+}
+
+func SandpayTransOrderCreate(outOrderID, amount, fromIpAddr, memo string) (resp xmap.M, err error) {
+	method := "sandpayTransOrderCreate"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("from_ip_addr", fromIpAddr)
+	if len(memo) > 0 {
+		p.SetValue("memo", memo)
+	}
+	resp, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(resp))
+	return
+}
+
 func UserRegist(req APIUserRegist) (resp xmap.M, err error) {
 	method := "userRegist"
 	p := newParams(method)
