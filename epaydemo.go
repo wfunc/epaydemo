@@ -128,6 +128,7 @@ func AlipayTradePreCreate(outOrderID, amount, subject, memo string) (resp xmap.M
 	if len(memo) > 0 {
 		p.SetValue("memo", memo)
 	}
+	debugf("request：%v", converter.JSON(p))
 	resp, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
 	debugf("response：%v", converter.JSON(resp))
 	return
