@@ -240,6 +240,22 @@ func SendWKPayment(req APISendWKPayment) (resp xmap.M, err error) {
 	return
 }
 
+// Tianyi
+func TianyiPay(outOrderID, amount, notifyUrl, ip, productName string) (data xmap.M, err error) {
+	method := "tianyiPay"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("product_name", productName)
+	p.SetValue("ip", ip)
+	p.SetValue("notify_url", notifyUrl)
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 // Adapay
 func BindCardApply(outOrderID, cardName, certID, cardNo, cardPhone, bankName string) (data xmap.M, err error) {
 	method := "bindCardApply"
