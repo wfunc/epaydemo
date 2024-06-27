@@ -240,6 +240,19 @@ func SendWKPayment(req APISendWKPayment) (resp xmap.M, err error) {
 	return
 }
 
+func UnifiedTradeNative(outOrderID, amount, fromIPAddr string) (data xmap.M, err error) {
+	method := "unifiedTradeNative"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("from_ip_addr", fromIPAddr)
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 // Tianyi
 func TianyiPay(outOrderID, amount, notifyUrl, ip, productName string) (data xmap.M, err error) {
 	method := "tianyiPay"
