@@ -270,7 +270,7 @@ func TianyiPay(outOrderID, amount, notifyUrl, ip, productName string) (data xmap
 }
 
 // huifu
-func TradePaymentJspay(outOrderID, amount, goodsDesc, fromIPAddr, notifyURL string) (data xmap.M, err error) {
+func TradePaymentJspay(outOrderID, amount, goodsDesc, fromIPAddr, notifyURL, memo string) (data xmap.M, err error) {
 	method := "tradePaymentJspay"
 	p := newParams(method)
 	sign := Sign(AccessToken, p)
@@ -280,6 +280,9 @@ func TradePaymentJspay(outOrderID, amount, goodsDesc, fromIPAddr, notifyURL stri
 	p.SetValue("goods_desc", goodsDesc)
 	p.SetValue("from_ip_addr", fromIPAddr)
 	p.SetValue("notify_url", notifyURL)
+	if len(memo) > 0 {
+		p.SetValue("memo", memo)
+	}
 	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
 	debugf("response：%v", converter.JSON(data))
 	return
