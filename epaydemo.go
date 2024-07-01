@@ -269,6 +269,22 @@ func TianyiPay(outOrderID, amount, notifyUrl, ip, productName string) (data xmap
 	return
 }
 
+// huifu
+func TradePaymentJspay(outOrderID, amount, goodsDesc, fromIPAddr, notifyURL string) (data xmap.M, err error) {
+	method := "tradePaymentJspay"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("goods_desc", goodsDesc)
+	p.SetValue("from_ip_addr", fromIPAddr)
+	p.SetValue("notify_url", notifyURL)
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 // Adapay
 func BindCardApply(outOrderID, cardName, certID, cardNo, cardPhone, bankName string) (data xmap.M, err error) {
 	method := "bindCardApply"
