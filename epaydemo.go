@@ -134,6 +134,22 @@ func AlipayTradePreCreate(outOrderID, amount, subject, memo string) (resp xmap.M
 	return
 }
 
+func UnifyPayCreate(outOrderID, amount, notifyURL, memo string) (data xmap.M, err error) {
+	method := "unifyPayCreate"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("notify_url", notifyURL)
+	if len(memo) > 0 {
+		p.SetValue("memo", memo)
+	}
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 func SandpayTransOrderCreate(outOrderID, amount, fromIpAddr, memo, subject string) (resp xmap.M, err error) {
 	method := "sandpayTransOrderCreate"
 	p := newParams(method)
