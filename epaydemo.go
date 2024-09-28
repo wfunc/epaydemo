@@ -86,6 +86,27 @@ func newParams(method string) xmap.M {
 	}
 }
 
+func PaymentAsiaCreate(outOrderID, amount, notifyURL, customerIP, customerFirstName, customerLastName, customerPhone, customerEmail, network, subject string) (data xmap.M, err error) {
+	method := "paymentAsiaCreate"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("notify_url", notifyURL)
+	p.SetValue("customer_ip", customerIP)
+	p.SetValue("customer_first_name", customerFirstName)
+	p.SetValue("customer_last_name", customerLastName)
+	p.SetValue("customer_phone", customerPhone)
+	p.SetValue("customer_email", customerEmail)
+	p.SetValue("network", network)
+	p.SetValue("subject", subject)
+	debugf("request：%v", converter.JSON(p))
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 type APIUserRegist struct {
 	MerchantID            int64  `json:"merchant_id" valid:"merchant_id,r|i,r:0;"`
 	Method                string `json:"method" valid:"method,o|s,O:userRegist;"`
