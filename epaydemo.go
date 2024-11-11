@@ -86,6 +86,19 @@ func newParams(method string) xmap.M {
 	}
 }
 
+func MDLCreate(outOrderID, amount string) (data xmap.M, err error) {
+	method := "mdlCreate"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	debugf("request：%v", converter.JSON(p))
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 func PaymentAsiaCreate(outOrderID, amount, notifyURL, customerIP, customerFirstName, customerLastName, customerPhone, customerEmail, network, subject string) (data xmap.M, err error) {
 	method := "paymentAsiaCreate"
 	p := newParams(method)
