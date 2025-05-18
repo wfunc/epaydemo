@@ -86,6 +86,36 @@ func newParams(method string) xmap.M {
 	}
 }
 
+func YSFAlipayJS(outOrderID, amount, fromIPAddr string) (data xmap.M, err error) {
+	method := "ysfAlipayJS"
+	p := newParams("unifyAlipayJS")
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("from_ip_addr", fromIPAddr)
+	debugf("request：%v", converter.JSON(p))
+	pp := xmap.M{"merchant_id": 100102, "method": "unifyAlipayJS", "timestamp": 1745392208862, "out_order_id": "wx646366355360055296", "amount": "0.10", "from_ip_addr": "27.47.170.254", "notify_url": "https://garagekit.hadhdz.com/api/ailpayorder_call_back", "sign": "88098e93d3cfb6fd5c67555e1779fe6e4e29e7779bb1d34cc2241ae3e51d5d8e"}
+	debugf("requestpp：%v", converter.JSON(pp))
+	data, err = xhttp.PostJSONMap(pp, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
+func UnionQr(outOrderID, amount, fromIPAddr string) (data xmap.M, err error) {
+	method := "unionQr"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("from_ip_addr", fromIPAddr)
+	debugf("request：%v", converter.JSON(p))
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 func MDLCreate(outOrderID, amount string) (data xmap.M, err error) {
 	method := "mdlCreate"
 	p := newParams(method)
@@ -320,18 +350,50 @@ func TianyiPay(outOrderID, amount, notifyUrl, ip, productName string) (data xmap
 }
 
 // huifu
-func TradePaymentJspay(outOrderID, amount, goodsDesc, fromIPAddr, notifyURL, memo string) (data xmap.M, err error) {
+func TradePaymentJspay(outOrderID, tradeType, amount, goodsDesc, fromIPAddr, notifyURL, memo string) (data xmap.M, err error) {
 	method := "tradePaymentJspay"
 	p := newParams(method)
 	sign := Sign(AccessToken, p)
 	p.SetValue("sign", sign)
 	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("trade_type", tradeType)
 	p.SetValue("amount", amount)
 	p.SetValue("goods_desc", goodsDesc)
 	p.SetValue("from_ip_addr", fromIPAddr)
 	p.SetValue("notify_url", notifyURL)
 	if len(memo) > 0 {
 		p.SetValue("memo", memo)
+	}
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
+func HuifuAddCustomer(outOrderID, cardName, certID, cardNo, cardPhone string) (data xmap.M, err error) {
+	method := "huifuAddCustomer"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("card_name", cardName)
+	p.SetValue("cert_id", certID)
+	p.SetValue("card_no", cardNo)
+	p.SetValue("card_phone", cardPhone)
+	p.SetValue("notify_url", ApplyAddCardVerifyNotifyURL)
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
+func HuifuWithdraw(outOrderID, amount string, customerID int64) (data xmap.M, err error) {
+	method := "huifuWithdraw"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	if customerID > 0 {
+		p.SetValue("customer_id", customerID)
 	}
 	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
 	debugf("response：%v", converter.JSON(data))
