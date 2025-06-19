@@ -1,7 +1,6 @@
 package epaydemo
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"net/url"
 	"strings"
@@ -9,6 +8,7 @@ import (
 	"time"
 
 	"github.com/codingeasygo/util/converter"
+	"github.com/codingeasygo/util/xhash"
 	"github.com/codingeasygo/util/xhttp"
 	"github.com/codingeasygo/util/xmap"
 	"github.com/shopspring/decimal"
@@ -65,9 +65,10 @@ func Sign(AccessToken string, m xmap.M) string {
 
 	signStr := fmt.Sprintf("%v&access_token=%v", args.Encode(), AccessToken)
 	debugf("the string before sign：%s", signStr)
-	h := sha256.New()
-	h.Write([]byte(signStr))
-	return fmt.Sprintf("%x", h.Sum(nil))
+	return xhash.MD5([]byte(signStr))
+	// h := sha256.New()
+	// h.Write([]byte(signStr))
+	// return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 // verify sign
@@ -449,6 +450,8 @@ func BindCardApply(outOrderID, cardName, certID, cardNo, cardPhone, bankName str
 	p.SetValue("card_phone", cardPhone)
 	p.SetValue("bank_card_type", "debit")
 	p.SetValue("bank_name", bankName)
+	p.SetValue("prov_id", "440000")
+	p.SetValue("area_id", "440100")
 	p.SetValue("notify_url", ApplyAddCardVerifyNotifyURL)
 	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
 	debugf("response：%v", converter.JSON(data))
