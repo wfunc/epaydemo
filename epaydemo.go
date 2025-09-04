@@ -1,6 +1,7 @@
 package epaydemo
 
 import (
+	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
 	"net/url"
@@ -75,6 +76,32 @@ func Sign(AccessToken string, m xmap.M) string {
 func VerifySign(AccessToken string, m xmap.M) bool {
 	sign := m.Str("sign")
 	calcSign := Sign(AccessToken, m)
+	return strings.EqualFold(strings.ToLower(sign), strings.ToLower(calcSign))
+}
+
+func MD5Sign(AccessToken string, m xmap.M) string {
+	args := url.Values{}
+	// format timestamp
+	timestamp, err := decimal.NewFromString(m.Str("timestamp"))
+	if err != nil {
+		return ""
+	}
+	args.Set("merchant_id", m.Str("merchant_id"))
+	args.Set("timestamp", timestamp.String())
+	args.Set("method", m.Str("method"))
+
+	signStr := fmt.Sprintf("%v&access_token=%v", args.Encode(), AccessToken)
+	debugf("the string before sign：%s", signStr)
+	// return xhash.MD5([]byte(signStr))
+	h := md5.New()
+	h.Write([]byte(signStr))
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+// verify sign
+func MD5VerifySign(AccessToken string, m xmap.M) bool {
+	sign := m.Str("sign")
+	calcSign := MD5Sign(AccessToken, m)
 	return strings.EqualFold(strings.ToLower(sign), strings.ToLower(calcSign))
 }
 
@@ -358,6 +385,25 @@ func TradePaymentJspay(outOrderID, tradeType, amount, goodsDesc, fromIPAddr, not
 	p.SetValue("sign", sign)
 	p.SetValue("out_order_id", outOrderID)
 	p.SetValue("trade_type", tradeType)
+	p.SetValue("amount", amount)
+	p.SetValue("goods_desc", goodsDesc)
+	p.SetValue("from_ip_addr", fromIPAddr)
+	p.SetValue("notify_url", notifyURL)
+	if len(memo) > 0 {
+		p.SetValue("memo", memo)
+	}
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
+// huifu
+func TradeHostingPaymentPreorder(outOrderID, amount, goodsDesc, fromIPAddr, notifyURL, memo string) (data xmap.M, err error) {
+	method := "tradeHostingPaymentPreorder"
+	p := newParams(method)
+	sign := MD5Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
 	p.SetValue("amount", amount)
 	p.SetValue("goods_desc", goodsDesc)
 	p.SetValue("from_ip_addr", fromIPAddr)
