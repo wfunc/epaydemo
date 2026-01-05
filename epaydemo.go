@@ -483,6 +483,27 @@ func YsfAlipayJS(outOrderID, amount, goodsDesc, fromIPAddr, notifyURL, memo stri
 	return
 }
 
+func UnifiedOrder(outOrderID, amount, payType, goodsDesc, fromIPAddr, notifyURL, memo string) (data xmap.M, err error) {
+	method := "unifiedOrder"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("goods_desc", goodsDesc)
+	p.SetValue("from_ip_addr", fromIPAddr)
+	p.SetValue("notify_url", notifyURL)
+	p.SetValue("pay_type", payType)
+	if len(memo) > 0 {
+		p.SetValue("memo", memo)
+	}
+	debugf("request url：%v", ApiURL+"/easyapi/"+method)
+	debugf("request json：%v", converter.JSON(p))
+	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
+	debugf("response：%v", converter.JSON(data))
+	return
+}
+
 // Adapay
 func BindCardApply(outOrderID, cardName, certID, cardNo, cardPhone, bankName string) (data xmap.M, err error) {
 	method := "bindCardApply"
