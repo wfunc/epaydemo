@@ -1,10 +1,13 @@
 package epaydemo
 
 import (
+	"bytes"
 	"crypto/md5"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -16,9 +19,9 @@ import (
 )
 
 var (
-	MerchantID                  = 0
-	AccessToken                 = "xx"
-	ApiURL                      = "https://example.com"
+	MerchantID                  = 100003
+	AccessToken                 = envString("EPAY_ACCESS_TOKEN", "xx")
+	ApiURL                      = envString("EPAY_API_URL", "https://epay.dywxgz.com")
 	PayCreateNotifyURL          = "https://example.com/notify/testNofity"
 	ApplyWithdrawNotifyURL      = "https://example.com/notify/testNofity"
 	ApplyOpenAcctNotifyURL      = "https://example.com/notify/testNofity"
@@ -38,6 +41,20 @@ var (
 	NoBindWKPaymentNotifyURL    = "https://example.com/notify/testNofity"
 
 	Debug = false
+)
+
+func envString(key, fallback string) string {
+	if value := os.Getenv(key); len(value) > 0 {
+		return value
+	}
+	return fallback
+}
+
+const (
+	DYJPaywayWechatJSPay = "WECHAT_JSPAY"
+	DYJPaywayAlipayJSPay = "ALIPAY_JSPAY"
+	DYJChannelWechat     = "wechat"
+	DYJChannelAlipay     = "alipay"
 )
 
 var MarchineID = 1
@@ -176,6 +193,113 @@ func PaymentAsiaCreate(outOrderID, amount, notifyURL, customerIP, customerFirstN
 	data, err = xhttp.PostJSONMap(p, ApiURL+"/easyapi/"+method)
 	debugf("response：%v", converter.JSON(data))
 	return
+}
+
+func easyAPIURL(method string) string {
+	return strings.TrimRight(ApiURL, "/") + "/easyapi/" + method
+}
+
+func setOptional(p xmap.M, key, value string) {
+	if len(value) > 0 {
+		p.SetValue(key, value)
+	}
+}
+
+func jsonNoHTMLEscape(v interface{}) string {
+	buf := &bytes.Buffer{}
+	encoder := json.NewEncoder(buf)
+	encoder.SetEscapeHTML(false)
+	if err := encoder.Encode(v); err != nil {
+		return converter.JSON(v)
+	}
+	return strings.TrimSpace(buf.String())
+}
+
+// DYJCashier creates a hosted DYJ cashier order and returns pay_url/cashier_url.
+func DYJCashier(outOrderID, amount, notifyURL, returnURL, channel, paywayCode, memo, goodsDesc string) (data xmap.M, err error) {
+	method := "dyjCashier"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	setOptional(p, "notify_url", notifyURL)
+	setOptional(p, "return_url", returnURL)
+	setOptional(p, "channel", channel)
+	setOptional(p, "payway_code", paywayCode)
+	setOptional(p, "memo", memo)
+	setOptional(p, "goods_desc", goodsDesc)
+	debugf("request：%v", jsonNoHTMLEscape(p))
+	data, err = xhttp.PostJSONMap(p, easyAPIURL(method))
+	debugf("response：%v", jsonNoHTMLEscape(data))
+	return
+}
+
+// DYJWechatCashier creates a hosted DYJ cashier order with the WeChat JSAPI payway.
+func DYJWechatCashier(outOrderID, amount, notifyURL, returnURL, memo, goodsDesc string) (data xmap.M, err error) {
+	return DYJCashier(outOrderID, amount, notifyURL, returnURL, DYJChannelWechat, DYJPaywayWechatJSPay, memo, goodsDesc)
+}
+
+// DYJAlipayCashier creates a hosted DYJ cashier order with the Alipay JSAPI payway.
+func DYJAlipayCashier(outOrderID, amount, notifyURL, returnURL, memo, goodsDesc string) (data xmap.M, err error) {
+	return DYJCashier(outOrderID, amount, notifyURL, returnURL, DYJChannelAlipay, DYJPaywayAlipayJSPay, memo, goodsDesc)
+}
+
+// DYJJSAPI creates a DYJ direct JSAPI order. For WeChat pass paywayCode=WECHAT_JSPAY
+// and buyerID=openid. For Alipay pass paywayCode=ALIPAY_JSPAY and buyerID=user_id.
+func DYJJSAPI(outOrderID, amount, notifyURL, paywayCode, buyerID, memo, goodsDesc string) (data xmap.M, err error) {
+	method := "dyjJSAPI"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	p.SetValue("payway_code", paywayCode)
+	setOptional(p, "notify_url", notifyURL)
+	setOptional(p, "memo", memo)
+	setOptional(p, "goods_desc", goodsDesc)
+	switch paywayCode {
+	case DYJPaywayWechatJSPay:
+		p.SetValue("open_id", buyerID)
+	case DYJPaywayAlipayJSPay:
+		p.SetValue("user_id", buyerID)
+	default:
+		p.SetValue("buyer_id", buyerID)
+	}
+	debugf("request：%v", jsonNoHTMLEscape(p))
+	data, err = xhttp.PostJSONMap(p, easyAPIURL(method))
+	debugf("response：%v", jsonNoHTMLEscape(data))
+	return
+}
+
+// DYJWechatJSAPI creates a direct WeChat JSAPI order. The openID must be real
+// and belong to the app configured by the upstream DYJ channel.
+func DYJWechatJSAPI(outOrderID, amount, notifyURL, openID, memo, goodsDesc string) (data xmap.M, err error) {
+	return DYJJSAPI(outOrderID, amount, notifyURL, DYJPaywayWechatJSPay, openID, memo, goodsDesc)
+}
+
+// DYJAlipayJSAPI creates a direct Alipay JSAPI order. The userID must be a real
+// Alipay buyer user_id accepted by the upstream DYJ channel.
+func DYJAlipayJSAPI(outOrderID, amount, notifyURL, userID, memo, goodsDesc string) (data xmap.M, err error) {
+	return DYJJSAPI(outOrderID, amount, notifyURL, DYJPaywayAlipayJSPay, userID, memo, goodsDesc)
+}
+
+// DYJWxOAuthURL returns the platform OAuth URL used to obtain a WeChat openid.
+func DYJWxOAuthURL(state string) string {
+	u := strings.TrimRight(ApiURL, "/") + "/easyapi/dyjWxOAuth"
+	if len(state) == 0 {
+		return u
+	}
+	return u + "?state=" + url.QueryEscape(state)
+}
+
+// DYJAliOAuthURL returns the platform OAuth URL used to obtain an Alipay user_id.
+func DYJAliOAuthURL(state string) string {
+	u := strings.TrimRight(ApiURL, "/") + "/easyapi/dyjAliOAuth"
+	if len(state) == 0 {
+		return u
+	}
+	return u + "?state=" + url.QueryEscape(state)
 }
 
 type APIUserRegist struct {
