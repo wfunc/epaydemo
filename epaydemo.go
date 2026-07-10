@@ -52,6 +52,7 @@ func envString(key, fallback string) string {
 
 const (
 	DYJPaywayWechatJSPay = "WECHAT_JSPAY"
+	DYJPaywayWechatMP    = "WECHAT_MP"
 	DYJPaywayAlipayJSPay = "ALIPAY_JSPAY"
 	DYJChannelWechat     = "wechat"
 	DYJChannelAlipay     = "alipay"
@@ -235,6 +236,28 @@ func DYJCashier(outOrderID, amount, notifyURL, returnURL, channel, paywayCode, m
 	return
 }
 
+func DYJCashierWithoutPaywayCode(outOrderID, amount, notifyURL, returnURL, memo, goodsDesc string) (data xmap.M, err error) {
+	method := "dyjCashier"
+	p := newParams(method)
+	sign := Sign(AccessToken, p)
+	p.SetValue("sign", sign)
+	p.SetValue("out_order_id", outOrderID)
+	p.SetValue("amount", amount)
+	setOptional(p, "notify_url", notifyURL)
+	setOptional(p, "return_url", returnURL)
+	setOptional(p, "memo", memo)
+	setOptional(p, "goods_desc", goodsDesc)
+	debugf("request：%v", jsonNoHTMLEscape(p))
+	data, err = xhttp.PostJSONMap(p, easyAPIURL(method))
+	debugf("response：%v", jsonNoHTMLEscape(data))
+	return
+}
+
+// DYJWechatMPCashier creates a hosted DYJ cashier order with the WeChat Mini Program payway.
+func DYJWechatMPCashier(outOrderID, amount, notifyURL, returnURL, memo, goodsDesc string) (data xmap.M, err error) {
+	return DYJCashier(outOrderID, amount, notifyURL, returnURL, DYJChannelWechat, DYJPaywayWechatMP, memo, goodsDesc)
+}
+
 // DYJWechatCashier creates a hosted DYJ cashier order with the WeChat JSAPI payway.
 func DYJWechatCashier(outOrderID, amount, notifyURL, returnURL, memo, goodsDesc string) (data xmap.M, err error) {
 	return DYJCashier(outOrderID, amount, notifyURL, returnURL, DYJChannelWechat, DYJPaywayWechatJSPay, memo, goodsDesc)
@@ -263,6 +286,7 @@ func DYJJSAPI(outOrderID, amount, notifyURL, paywayCode, buyerID, memo, goodsDes
 		p.SetValue("open_id", buyerID)
 	case DYJPaywayAlipayJSPay:
 		p.SetValue("user_id", buyerID)
+	case DYJPaywayWechatMP:
 	default:
 		p.SetValue("buyer_id", buyerID)
 	}
